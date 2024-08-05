@@ -1,10 +1,9 @@
-// main.dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'chat_model.dart';
 import 'intro_screen.dart';
 
-const String openAIAPIKey = '';
+const String openAIAPIKey = 'YOUR_OPENAI';
 
 void main() {
   runApp(MyApp());

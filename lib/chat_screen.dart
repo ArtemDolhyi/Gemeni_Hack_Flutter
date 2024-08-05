@@ -1,7 +1,7 @@
-// chat_screen.dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'chat_model.dart';
+import 'dart:io';
 
 class ChatScreen extends StatelessWidget {
   final TextEditingController _controller = TextEditingController();
@@ -26,30 +26,50 @@ class ChatScreen extends StatelessWidget {
           Expanded(
             child: Consumer<ChatModel>(
               builder: (context, chatModel, child) {
-                return ListView.builder(
-                  reverse: true,
-                  itemCount: chatModel.messages.length,
-                  itemBuilder: (context, index) {
-                    final message = chatModel.messages[chatModel.messages.length - 1 - index];
-                    final isUserMessage = message['role'] == 'user';
-                    return Align(
-                      alignment: isUserMessage ? Alignment.centerRight : Alignment.centerLeft,
-                      child: Container(
-                        margin: EdgeInsets.symmetric(vertical: 4, horizontal: 16),
-                        padding: EdgeInsets.symmetric(vertical: 10, horizontal: 14),
-                        decoration: BoxDecoration(
-                          color: isUserMessage ? Colors.blue : Colors.grey[300],
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Text(
-                          message['content']!,
-                          style: TextStyle(
-                            color: isUserMessage ? Colors.white : Colors.black,
-                          ),
+                return Column(
+                  children: [
+                    Expanded(
+                      child: ListView.builder(
+                        reverse: true,
+                        itemCount: chatModel.messages.length,
+                        itemBuilder: (context, index) {
+                          final message = chatModel.messages[chatModel.messages.length - 1 - index];
+                          final isUserMessage = message['role'] == 'user';
+                          return Align(
+                            alignment: isUserMessage ? Alignment.centerRight : Alignment.centerLeft,
+                            child: Container(
+                              margin: EdgeInsets.symmetric(vertical: 4, horizontal: 16),
+                              padding: EdgeInsets.symmetric(vertical: 10, horizontal: 14),
+                              decoration: BoxDecoration(
+                                color: isUserMessage ? Colors.blue : Colors.grey[300],
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: message['imagePath'] != null
+                                  ? Image.file(File(message['imagePath']!))
+                                  : Text(
+                                      message['content']!,
+                                      style: TextStyle(
+                                        color: isUserMessage ? Colors.white : Colors.black,
+                                      ),
+                                    ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    if (chatModel.isTyping)
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            CircularProgressIndicator(),
+                            SizedBox(width: 8),
+                            Text("Bot is typing..."),
+                          ],
                         ),
                       ),
-                    );
-                  },
+                  ],
                 );
               },
             ),
@@ -58,6 +78,10 @@ class ChatScreen extends StatelessWidget {
             padding: const EdgeInsets.all(8.0),
             child: Row(
               children: [
+                IconButton(
+                  icon: Icon(Icons.image),
+                  onPressed: () => Provider.of<ChatModel>(context, listen: false).sendImage(),
+                ),
                 Expanded(
                   child: TextField(
                     controller: _controller,
