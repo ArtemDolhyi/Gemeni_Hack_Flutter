@@ -84,27 +84,52 @@ class ChatScreen extends StatelessWidget {
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Row(
-              children: [
-                IconButton(
-                  icon: Icon(Icons.image),
-                  onPressed: () => Provider.of<ChatModel>(context, listen: false).sendImage(),
-                ),
-                Expanded(
-                  child: TextField(
-                    controller: _controller,
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(),
-                      hintText: 'Enter your message',
+            child: Consumer<ChatModel>(
+              builder: (context, chatModel, child) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Padding added to align quick replies with input line
+                    Padding(
+                      padding: const EdgeInsets.only(left: 40.0),  // Adjust this value as needed
+                      child: Wrap(
+                        spacing: 8.0,
+                        children: chatModel.quickReplies.map((reply) {
+                          return ActionChip(
+                            label: Text(reply),
+                            onPressed: () {
+                              Provider.of<ChatModel>(context, listen: false).sendQuickReply(reply);
+                            },
+                          );
+                        }).toList(),
+                      ),
                     ),
-                    onSubmitted: (_) => _sendMessage(context), // Handle "Enter" key press
-                  ),
-                ),
-                IconButton(
-                  icon: Icon(Icons.send),
-                  onPressed: () => _sendMessage(context),
-                ),
-              ],
+                    SizedBox(height: 10),
+                    Row(
+                      children: [
+                        IconButton(
+                          icon: Icon(Icons.image),
+                          onPressed: () => Provider.of<ChatModel>(context, listen: false).sendImage(),
+                        ),
+                        Expanded(
+                          child: TextField(
+                            controller: _controller,
+                            decoration: InputDecoration(
+                              border: OutlineInputBorder(),
+                              hintText: 'Enter your message',
+                            ),
+                            onSubmitted: (_) => _sendMessage(context), // Handle "Enter" key press
+                          ),
+                        ),
+                        IconButton(
+                          icon: Icon(Icons.send),
+                          onPressed: () => _sendMessage(context),
+                        ),
+                      ],
+                    ),
+                  ],
+                );
+              },
             ),
           ),
         ],
