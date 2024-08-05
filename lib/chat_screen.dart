@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'chat_model.dart';
 import 'dart:io';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 class ChatScreen extends StatelessWidget {
   final TextEditingController _controller = TextEditingController();
@@ -44,14 +45,21 @@ class ChatScreen extends StatelessWidget {
                                 color: isUserMessage ? Colors.blue : Colors.grey[300],
                                 borderRadius: BorderRadius.circular(12),
                               ),
-                              child: message['imagePath'] != null
-                                  ? Image.file(File(message['imagePath']!))
-                                  : Text(
-                                      message['content']!,
-                                      style: TextStyle(
-                                        color: isUserMessage ? Colors.white : Colors.black,
-                                      ),
-                                    ),
+                              child: kIsWeb && message['imagePath'] != null
+                                  ? Placeholder(
+                                      fallbackHeight: 200.0,
+                                      fallbackWidth: 300.0,
+                                      color: Colors.grey,
+                                      strokeWidth: 2.0,
+                                    )
+                                  : message['imagePath'] != null
+                                      ? Image.file(File(message['imagePath']!))
+                                      : Text(
+                                          message['content']!,
+                                          style: TextStyle(
+                                            color: isUserMessage ? Colors.white : Colors.black,
+                                          ),
+                                        ),
                             ),
                           );
                         },
